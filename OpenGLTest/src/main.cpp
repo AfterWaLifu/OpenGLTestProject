@@ -9,6 +9,7 @@
 
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
+#include "VertexArray.h"
 
 static std::string ReadFile(const std::string& fileName) {
     std::ifstream f(fileName);
@@ -93,14 +94,12 @@ int main(void)
         3,2,0
     };
 
-    unsigned int vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
+    VertexArray va;
+    VertexBuffer vb(vertexes, 8 * sizeof(float));    
 
-    VertexBuffer vb(vertexes, 8 * sizeof(float));
-
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float)*2, 0);
+    VertexBufferLayout layout;
+    layout.Push<float>(2);
+    va.addBuffer(vb, layout);
 
     IndexBuffer ib(indices, 6);
 
@@ -122,9 +121,14 @@ int main(void)
     {
         glClear(GL_COLOR_BUFFER_BIT);
 
+        glUseProgram(shader);
+        glUniform4f(location, color, color, color, 1.0f);
+
+        va.Bind();
+        ib.Bind();
+
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
-        glUniform4f(location, color, color, color, 1.0f);
         color += increment;
         if (color >= 0.99f) increment = -0.01f;
         else if (color <= 0.01f) increment = 0.01f;
