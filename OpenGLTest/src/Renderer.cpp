@@ -5,10 +5,10 @@
 void GLClearErrors() {
     while (glGetError() != GL_NO_ERROR);
 }
-
-bool GLLogCall() {
-    if (GLenum error = glGetError()) {
-        std::cout << "[OPENGL ERROR] (" << error << ")" << std::endl;
+bool GLLogCall(const char* function, const char* file, const int line) {
+    while (GLenum error = glGetError()) {
+        std::cout << "[OpenGL Error] " << error
+            << function << " : " << file << " : " << line << std::endl;
         return false;
     }
     return true;
@@ -16,7 +16,7 @@ bool GLLogCall() {
 
 void Renderer::Clear() const
 {
-    glClear(GL_COLOR_BUFFER_BIT);
+    GLCall(glClear(GL_COLOR_BUFFER_BIT));
 }
 
 void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const
@@ -24,5 +24,5 @@ void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& 
     shader.Bind();
     va.Bind();
     ib.Bind();
-    glDrawElements(GL_TRIANGLES, ib.GetCount(), GL_UNSIGNED_INT, nullptr);
+    GLCall(glDrawElements(GL_TRIANGLES, ib.GetCount(), GL_UNSIGNED_INT, nullptr));
 }

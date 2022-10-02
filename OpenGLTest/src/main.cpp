@@ -38,10 +38,10 @@ int main(void)
     std::cout << glGetString(GL_VERSION) << std::endl;
 
     float vertexes[] = {
-        -0.5f,-0.5f, 0.0f, 0.0f, //0
-         0.5f,-0.5f, 1.0f, 0.0f, //1
-         0.5f, 0.5f, 1.0f, 1.0f, //2
-        -0.5f, 0.5f, 0.0f, 1.0f  //3
+        -1.0f,-1.0f, 0.0f, 0.0f, //0
+         1.0f,-1.0f, 1.0f, 0.0f, //1
+         1.0f, 1.0f, 1.0f, 1.0f, //2
+        -1.0f, 1.0f, 0.0f, 1.0f  //3
     };
 
     unsigned int indices[] = {
@@ -49,8 +49,8 @@ int main(void)
         2,3,0
     };
 
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_BLEND);
+    GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+    GLCall(glEnable(GL_BLEND));
 
     VertexArray va;
     VertexBuffer vb(vertexes, 4 * 4 * sizeof(float));

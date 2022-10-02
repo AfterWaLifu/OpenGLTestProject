@@ -13,7 +13,7 @@
     ASSERT(GLLogCall(#x, __FILE__, __LINE__))
 
 void GLClearErrors();
-bool GLLogCall();
+bool GLLogCall(const char* function, const char* file, const int line);
 
 class Renderer
 {
