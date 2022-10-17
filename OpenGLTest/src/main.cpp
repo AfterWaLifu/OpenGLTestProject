@@ -1,6 +1,9 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -17,11 +20,13 @@
 int main(void)
 {
     GLFWwindow* window;
+    const int width = 1280;
+    const int height = 720;
 
     if (!glfwInit())
         return -1;
 
-    window = glfwCreateWindow(1280, 720, "Testing OpenGL", NULL, NULL);
+    window = glfwCreateWindow(width, height, "Testing OpenGL", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -38,10 +43,10 @@ int main(void)
     std::cout << glGetString(GL_VERSION) << std::endl;
 
     float vertexes[] = {
-        -1.0f,-1.0f, 0.0f, 0.0f, //0
-         1.0f,-1.0f, 1.0f, 0.0f, //1
-         1.0f, 1.0f, 1.0f, 1.0f, //2
-        -1.0f, 1.0f, 0.0f, 1.0f  //3
+       0.0f   ,0.0f  ,   0.0f, 0.0f, //0
+       1280.0f,0.0f  ,   1.0f, 0.0f, //1
+       1280.0f,720.0f,   1.0f, 1.0f, //2
+       0.0f   ,720.0f,   0.0f, 1.0f  //3
     };
 
     unsigned int indices[] = {
@@ -62,11 +67,14 @@ int main(void)
 
     IndexBuffer ib(indices, 6);
 
+    glm::mat4 proj = glm::ortho(0.0f , 1280.0f, 0.0f, 720.0f, -1.0f, 1.0f);
+
     Shader shader("res/vertex.vert", "res/fragment.frag");
 
-    Texture texture("res/textures/mugi.png");
+    Texture texture("res/textures/smortDogge.png");
     texture.Bind();
     shader.SetUniform1i("u_Texture", 0);
+    shader.SetUniformMat4f("u_MVP", proj);
 
     va.Unbind();
     vb.Unbind();
