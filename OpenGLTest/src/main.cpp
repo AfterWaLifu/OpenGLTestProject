@@ -4,6 +4,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -43,10 +47,10 @@ int main(void)
     std::cout << glGetString(GL_VERSION) << std::endl;
 
     float vertexes[] = {
-       0.0f   ,0.0f  ,   0.0f, 0.0f, //0
-       1280.0f,0.0f  ,   1.0f, 0.0f, //1
-       1280.0f,720.0f,   1.0f, 1.0f, //2
-       0.0f   ,720.0f,   0.0f, 1.0f  //3
+       100.0f ,  0.0f,   0.0f, 0.0f, //0
+       400.0f ,  0.0f,   1.0f, 0.0f, //1
+       400.0f ,300.0f,   1.0f, 1.0f, //2
+       100.0f ,300.0f,   0.0f, 1.0f  //3
     };
 
     unsigned int indices[] = {
@@ -68,13 +72,13 @@ int main(void)
     IndexBuffer ib(indices, 6);
 
     glm::mat4 proj = glm::ortho(0.0f , 1280.0f, 0.0f, 720.0f, -1.0f, 1.0f);
+    glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-100.0f, 0.0f, 0.0f));
 
     Shader shader("res/vertex.vert", "res/fragment.frag");
 
     Texture texture("res/textures/smortDogge.png");
     texture.Bind();
     shader.SetUniform1i("u_Texture", 0);
-    shader.SetUniformMat4f("u_MVP", proj);
 
     va.Unbind();
     vb.Unbind();
@@ -83,6 +87,12 @@ int main(void)
 
     Renderer renderer;
 
+    ImGui::CreateContext();
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init();
+
+    glm::vec3 translation(0.0f, 0.0f, 0.0f);
+
     float color = 0.0f;
     float increment = 0.01f;
 
@@ -90,8 +100,16 @@ int main(void)
     {
         renderer.Clear();
 
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        glm::mat4 model = glm::translate(glm::mat4(1.0f), translation);
+        glm::mat4 mvp = proj * view * model;
+
         shader.Bind();
         shader.SetUniform4f("u_Color", color, color, color, 1.0f);
+        shader.SetUniformMat4f("u_MVP", mvp);
 
         renderer.Draw(va, ib, shader);
 
@@ -99,10 +117,28 @@ int main(void)
         if (color >= 0.99f) increment = -0.01f;
         else if (color <= 0.01f) increment = 0.01f;
 
+        bool show_demo_window = true;
+        bool show_another_window = false;
+        ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+        {
+            ImGui::SliderFloat3("translation", &translation.x, 0.0f, 1280.0f);
+
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+            //ImGui::End();
+        }
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
         glfwSwapBuffers(window);
 
         glfwPollEvents();
     }
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 
     glfwTerminate();
     exit(0);
