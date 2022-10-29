@@ -1,7 +1,7 @@
 build/
 build-int/
 logs.txt
-imgui.ini
+*.ini
 
 # Prerequisites
 *.d
