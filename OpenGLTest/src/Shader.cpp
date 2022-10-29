@@ -97,13 +97,13 @@ unsigned int Shader::CreateShader()
     return program;
 }
 
-int Shader::GetUniformLocation(const std::string& name)
+int Shader::GetUniformLocation(const std::string& name) const
 {
     if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end()) {
         return m_UniformLocationCache[name];
     }
 
-    GLCall(int location = glGetUniformLocation(m_RendererID, name.c_str() ));
+    int location = glGetUniformLocation(m_RendererID, name.c_str());
     if (location == -1) {
         std::cout << "uniform " << name << " cant be found\n";
     }
